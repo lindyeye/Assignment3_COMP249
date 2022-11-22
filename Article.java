@@ -117,7 +117,7 @@ public class Article {
     public void setMonth(String month) {
         this.month = month;
     }
-    
+    //idea here is that it seperates the author names and puts them into a new string so they're properly formatted. idk if it works this is just a theory
     public String toIEEE()
     {
         int index = author.indexOf(" and ");
@@ -128,8 +128,7 @@ public class Article {
             index = authorIEEE.indexOf(" and ");
         }
         authorIEEE += ".";
-        return authorIEEE + title + "," + journal + "," + volume + ", p." + pages + "," + month + " " + year + ".";
-                
+        return authorIEEE + title + "," + journal + "," + volume + ", p." + pages + "," + month + " " + year + ".";  
                 
     }
 
