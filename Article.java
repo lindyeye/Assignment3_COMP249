@@ -118,6 +118,19 @@ public class Article {
         this.month = month;
     }
     
-
+    public String toIEEE()
+    {
+        int index = author.indexOf(" and ");
+        String authorIEEE = author;
+        while(index != -1)
+        {
+            authorIEEE = authorIEEE.substring(0,index)+", "+ authorIEEE.substring(index + 5);
+            index = authorIEEE.indexOf(" and ");
+        }
+        authorIEEE += ".";
+        return authorIEEE + title + "," + journal + "," + volume + ", p." + pages + "," + month + " " + year + ".";
+                
+                
+    }
 
 }
