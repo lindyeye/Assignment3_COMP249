@@ -12,6 +12,7 @@ public class Article {
     private String doi;
     private String ISSN;
     private String month;
+    private int index;
     /**
 	 * Constructor takes in parameters and creates a new Article object
 	 * @param author name of author of the article.
@@ -25,8 +26,9 @@ public class Article {
 	 * @param doi doi of article.
 	 * @param ISSN ISSN of article.
 	 * @param month month article was published.
+     * @param index index of article in Latex
 	 */
-    public Article(String author, String journal, String title, String year, String volume, String number, String pages, String keywords, String doi, String ISSN, String month)
+    public Article(String author, String journal, String title, String year, String volume, String number, String pages, String keywords, String doi, String ISSN, String month, int index)
     {
         this.author = author;
         this.journal = journal;
@@ -39,6 +41,7 @@ public class Article {
         this.doi = doi;
         this.ISSN = ISSN;
         this.month = month;
+        this.index = index;
     }
 
     public String getAuthor() {
@@ -117,6 +120,14 @@ public class Article {
     public void setMonth(String month) {
         this.month = month;
     }
+
+    public int getIndex() {
+        return index;
+    }
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     //idea here is that it seperates the author names and puts them into a new string so they're properly formatted. idk if it works this is just a theory
     public String toIEEE()
     {
@@ -130,6 +141,11 @@ public class Article {
         authorIEEE += ".";
         return authorIEEE + title + "," + journal + "," + volume + ", p." + pages + "," + month + " " + year + ".";  
                 
+    }
+
+    public String toACM()
+    {
+        return "ur mum";
     }
 
 }
