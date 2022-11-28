@@ -135,17 +135,34 @@ public class Article {
         String authorIEEE = author;
         while(index != -1)
         {
-            authorIEEE = authorIEEE.substring(0,index)+", "+ authorIEEE.substring(index + 5);
+            authorIEEE = authorIEEE.substring(0, index)+ ", " + authorIEEE.substring(index + 5);
             index = authorIEEE.indexOf(" and ");
         }
         authorIEEE += ".";
-        return authorIEEE + title + "," + journal + "," + volume + ", p." + pages + "," + month + " " + year + ".";  
+        return authorIEEE + " " +  "\"" + title + "\"" + ", " + journal + ", vol. " + volume + ", no. " + number + ", p. " + pages + ", " + month + " " + year + ".";  
                 
     }
 
     public String toACM()
     {
-        return "ur mum";
+        int endIndex = author.indexOf(" and ");
+        String authorACM = author;
+        if (endIndex != -1){
+            authorACM = author.substring(0, endIndex) + " et al";
+        }
+        return "[" + index + "]" + "\t" + authorACM + ". " + year + ". " + title + ". " + journal + ". " + volume + ", " + number +
+        "(" + year + "), " + pages + ". DOI:https://doi.org/" + doi + ".";
+    }
+
+    public String toNJ(){
+        int index = author.indexOf(" and ");
+        String authorNJ = author;
+        while(index != -1)
+        {
+            authorNJ = authorNJ.substring(0, index)+ " & " + authorNJ.substring(index + 5);
+            index = authorNJ.indexOf(" and ");
+        }
+        return authorNJ + ". " + title + ". " + journal + ". " + volume + ", " + pages + "(" + year + ").";
     }
 
 }
