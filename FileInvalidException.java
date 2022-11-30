@@ -1,4 +1,17 @@
 public class FileInvalidException extends Exception {
-    //we need file not found exception and file invalid for when one of the descriptions is blank
-    //im avoiding this cause i barely know exceptions but it shouldn't be that hard
+    public FileInvalidException()
+	{
+		super("Error: Input file cannot be parsed due to missing information(i.e. month={}, title={}, etc.)");
+	}
+	
+	// A constructor that takes a String parameter
+	public FileInvalidException(String s)
+	{
+		super(s);
+	}
+	
+	public String getMessage()
+	{
+		return super.getMessage();
+	}
 }

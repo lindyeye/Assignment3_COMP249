@@ -11,17 +11,113 @@ import java.io.FileReader;
 //look up use delimeter it miht be useful for this not sure
 public class BibliographyFactory {
 
-    public static void processFilesForValidation(Scanner s, PrintWriter p)
+    public static void processFilesForValidation(Scanner s, PrintWriter p, String fileType)
 	{
 		// Read line by line from input file and copy it to output file
 		String str;
-		
+		String type;
+		String data;
+		int startIndex;
+		int endIndex;
+		boolean noData = false;
+		int counter = 0;
+		int articleCounter = 1;
+
+		String author = null;
+		String journal = null;
+		String title = null;
+		String year = null;
+		String volume = null;
+		String number = null;
+		String pages = null;
+		String keywords = null;
+		String doi = null;
+		String ISSN = null;
+		String month = null;
+		int articleIndex = 1;
+
+		// yeah good luck figuring this one out
 		while(s.hasNextLine())
 		{
+			counter = 0;
+			noData = false;
 			str = s.nextLine();		
-			p.println(str);
+			if(str.indexOf("@ARTICLE{") != -1){
+				//System.out.println("Article found!");
+				articleIndex = articleCounter;
+				while (counter < 11){	// there are always 11
+					str = s.nextLine();
+					//System.out.println("Line: " + str);
+					if(str.indexOf("={") != -1){
+						startIndex = str.indexOf("={");
+						if (str.charAt(startIndex + 2) == '}'){
+							System.out.println("No data");
+							noData = true;
+							break;
+						}
+						endIndex = str.indexOf("},");
+						data = str.substring(startIndex + 2, endIndex);
+						//System.out.println("Data: " + data);
+						type = str.substring(0, startIndex);
+						//System.out.println("Type: " + type);
+						
+						if (type.equals("author")){
+							author = data;
+						}
+						else if (type.equals("journal")){
+							journal = data;
+						}
+						else if (type.equals("title")){
+							title = data;
+						}
+						else if (type.equals("year")){
+							year = data;
+						}
+						else if (type.equals("volume")){
+							volume = data;
+						}
+						else if (type.equals("number")){
+							number = data;
+						}
+						else if (type.equals("pages")){
+							pages = data;
+						}
+						else if (type.equals("keywords")){
+							keywords = data;
+						}
+						else if (type.equals("doi")){
+							doi = data;
+						}
+						else if (type.equals("ISSN")){
+							ISSN = data;
+						}
+						else if (type.equals("month")){
+							month = data;
+						}
+						
+						counter++;
+					}
+				}
+				if (!noData){
+					Article article = new Article(author, journal, title, year, volume, number, pages, keywords, doi, ISSN, month, articleIndex);
+					//System.out.println("Article object created!");
+					if (fileType.equals("IEEE")){
+						p.println(article.toIEEE());
+					}
+					else if(fileType.equals("ACM")){
+						p.println(article.toACM());
+					}
+					else if(fileType.equals("NJ")){
+						p.println(article.toNJ());
+					}
+					p.println();
+					articleCounter++;
+				}
+				//System.out.println();
+			}
 			
 		}
+		System.out.println("File done!");
         s.close();
         p.close();
 
@@ -50,6 +146,8 @@ public class BibliographyFactory {
         BufferedReader br = null;
 
 		// See if we can establish the two streams
+		
+		//IEEE output files
         for (int i = 1; i < 11; i++){
             try
             {
@@ -66,9 +164,52 @@ public class BibliographyFactory {
             }
             
             // At this moment, both streams exist, so call the method to create the fomatted files
-            processFilesForValidation(sc, pw);
+            processFilesForValidation(sc, pw, "IEEE");
             System.out.println("File has been copied ");
         }
+
+		// ACM output files
+		for (int i = 1; i < 11; i++){
+            try
+            {
+                s1 = "Latex" + i + ".bib";
+                s2 = "ACM" + i + ".json";
+                sc = new Scanner(new FileInputStream(s1));	
+                pw = new PrintWriter(new FileOutputStream(s2));
+            }
+            catch(FileNotFoundException e) 
+            {							   
+                System.out.println("Problem opening files. Cannot proceed to copy.");
+                System.out.println("Program will terminate.");
+                System.exit(0);			   
+            }
+            
+            // At this moment, both streams exist, so call the method to create the fomatted files
+            processFilesForValidation(sc, pw, "ACM");
+            System.out.println("File has been copied ");
+        }
+
+		// NJ output files
+		for (int i = 1; i < 11; i++){
+            try
+            {
+                s1 = "Latex" + i + ".bib";
+                s2 = "NJ" + i + ".json";
+                sc = new Scanner(new FileInputStream(s1));	
+                pw = new PrintWriter(new FileOutputStream(s2));
+            }
+            catch(FileNotFoundException e) 
+            {							   
+                System.out.println("Problem opening files. Cannot proceed to copy.");
+                System.out.println("Program will terminate.");
+                System.exit(0);			   
+            }
+            
+            // At this moment, both streams exist, so call the method to create the fomatted files
+            processFilesForValidation(sc, pw, "NJ");
+            System.out.println("File has been copied ");
+        }
+		
 
         System.out.println("Enter file name that you'd like to be printed: ");
         String fileName = kb.nextLine();
@@ -96,6 +237,7 @@ public class BibliographyFactory {
 			System.out.println("Program will terminate.");
 			System.exit(0);		
 		}
+	
 
         kb.close();
 	}
