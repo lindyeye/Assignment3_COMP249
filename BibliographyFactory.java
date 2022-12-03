@@ -1,21 +1,20 @@
+
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.io.BufferedReader;
-import java.io.FileReader;
-//driver class
-//im thinking we make a loop that goes through every file and puts each element into an array. then writes them into the files? idk fam
-//look up use delimeter it miht be useful for this not sure
-public class BibliographyFactory {
+import java.io.File;
 
-    public static void processFilesForValidation(Scanner s, PrintWriter p, String fileType)
+public class BibliographyFactory{
+
+
+	public static void processFilesForValidation(Scanner s, PrintWriter p, int fileNumber, File[] outputFiles)
 	{
 		// Read line by line from input file and copy it to output file
 		String str;
-		String type;
+		String type = "No type";
 		String data;
 		int startIndex;
 		int endIndex;
@@ -23,6 +22,7 @@ public class BibliographyFactory {
 		int counter = 0;
 		int articleCounter = 1;
 
+		Article[] article = new Article[20];
 		String author = null;
 		String journal = null;
 		String title = null;
@@ -50,16 +50,15 @@ public class BibliographyFactory {
 					//System.out.println("Line: " + str);
 					if(str.indexOf("={") != -1){
 						startIndex = str.indexOf("={");
+						type = str.substring(0, startIndex);
 						if (str.charAt(startIndex + 2) == '}'){
-							System.out.println("No data");
+							//System.out.println("No data");
 							noData = true;
 							break;
 						}
 						endIndex = str.indexOf("},");
 						data = str.substring(startIndex + 2, endIndex);
 						//System.out.println("Data: " + data);
-						type = str.substring(0, startIndex);
-						//System.out.println("Type: " + type);
 						
 						if (type.equals("author")){
 							author = data;
@@ -99,146 +98,191 @@ public class BibliographyFactory {
 					}
 				}
 				if (!noData){
-					Article article = new Article(author, journal, title, year, volume, number, pages, keywords, doi, ISSN, month, articleIndex);
+					article[articleCounter - 1] = new Article(author, journal, title, year, volume, number, pages, keywords, doi, ISSN, month, articleIndex);
 					//System.out.println("Article object created!");
-					if (fileType.equals("IEEE")){
-						p.println(article.toIEEE());
-					}
-					else if(fileType.equals("ACM")){
-						p.println(article.toACM());
-					}
-					else if(fileType.equals("NJ")){
-						p.println(article.toNJ());
-					}
-					p.println();
 					articleCounter++;
+				}
+				else {
+					System.out.println("Error: Detected Empty Field!");
+					System.out.println("============================\n");
+					System.out.println("Problem detected with input file: latex" + fileNumber + ".bib");
+					System.out.println("File is invalid: Field \"" + type + "\" is empty. Processing stopped at this point."
+					+  " Other empty fields may be present as well!\n");
+					outputFiles[fileNumber-1].delete();
+					outputFiles[fileNumber+10-1].delete();
+					outputFiles[fileNumber+20-1].delete();
+					s.close();
+					return;
 				}
 				//System.out.println();
 			}
 			
 		}
-		System.out.println("File done!");
-        s.close();
+		s.close();
+		try{
+			p = new PrintWriter(outputFiles[fileNumber-1]);
+		}
+		catch (Exception e){
+			System.out.println("Problem in processing method");
+		}
+		for (Article a : article){
+			if (a != null){
+				p.println(a.toIEEE());
+				p.println();
+			}
+		}
+		p.close();
+
+		try{
+			p = new PrintWriter(outputFiles[fileNumber+10-1]);
+		}
+		catch (Exception e){
+			System.out.println("Problem in processing method");
+		}
+		for (Article a : article){
+			if (a != null){
+				p.println(a.toACM());
+				p.println();
+			}
+		}
+		p.close();
+
+		try{
+			p = new PrintWriter(outputFiles[fileNumber+20-1]);
+		}
+		catch (Exception e){
+			System.out.println("Problem in processing method");
+		}
+		for (Article a : article){
+			if (a != null){
+				p.println(a.toNJ());
+				p.println();
+			}
+		}
+		//System.out.println("File done!");
         p.close();
-
 	}
 
-    public static void displayFileContents(BufferedReader b) throws IOException
-	{
-		String x;
-		
-		x = b.readLine();
-		while(x != null) 
-		{
-			System.out.print(x);		// MUST CAST; otherwise all what is read will be shown as integers
-			x = b.readLine();		
-		}
-		// Must close the file 
-		b.close();
-	}
-    public static void main(String[] args) 
-	{
-			
-		String s1, s2;
-		PrintWriter pw = null;		
-		Scanner kb = new Scanner(System.in);
+
+	public static void main(String args[]){
+		Scanner ui = new Scanner(System.in);
 		Scanner sc = null;
-        BufferedReader br = null;
+		PrintWriter pw = null;
+		String latexFile, outputFile, line;
+		File[] outputFiles = new File[30];
 
-		// See if we can establish the two streams
-		
-		//IEEE output files
-        for (int i = 1; i < 11; i++){
-            try
-            {
-                s1 = "Latex" + i + ".bib";
-                s2 = "IEEE" + i + ".json";
-                sc = new Scanner(new FileInputStream(s1));	
-                pw = new PrintWriter(new FileOutputStream(s2));
-            }
-            catch(FileNotFoundException e) 
-            {							   
-                System.out.println("Problem opening files. Cannot proceed to copy.");
-                System.out.println("Program will terminate.");
-                System.exit(0);			   
-            }
-            
-            // At this moment, both streams exist, so call the method to create the fomatted files
-            processFilesForValidation(sc, pw, "IEEE");
-            System.out.println("File has been copied ");
-        }
-
-		// ACM output files
+		/*
+		* Opens each file
+		*/
 		for (int i = 1; i < 11; i++){
-            try
-            {
-                s1 = "Latex" + i + ".bib";
-                s2 = "ACM" + i + ".json";
-                sc = new Scanner(new FileInputStream(s1));	
-                pw = new PrintWriter(new FileOutputStream(s2));
-            }
-            catch(FileNotFoundException e) 
-            {							   
-                System.out.println("Problem opening files. Cannot proceed to copy.");
-                System.out.println("Program will terminate.");
-                System.exit(0);			   
-            }
-            
-            // At this moment, both streams exist, so call the method to create the fomatted files
-            processFilesForValidation(sc, pw, "ACM");
-            System.out.println("File has been copied ");
-        }
+			latexFile = "Latex" + i + ".bib";
+			try{ 
+				sc = new Scanner(new FileInputStream(latexFile));
+			}
+			catch(FileNotFoundException e) {							   
+				System.out.println("Could not open file " + latexFile + "for reading");
+				System.out.println("\nPlease check if file exists! Program will terminate after closing any open files.");
+				sc.close();
+				System.exit(0);			   
+			}
+			sc.close();
+		}
 
-		// NJ output files
+		/*
+		 * Creates a file for each file type, and stores in file array so that they can be deleted if any cannot be made
+		 * or deleted once the program finishes
+		 */
 		for (int i = 1; i < 11; i++){
-            try
-            {
-                s1 = "Latex" + i + ".bib";
-                s2 = "NJ" + i + ".json";
-                sc = new Scanner(new FileInputStream(s1));	
-                pw = new PrintWriter(new FileOutputStream(s2));
-            }
-            catch(FileNotFoundException e) 
-            {							   
-                System.out.println("Problem opening files. Cannot proceed to copy.");
-                System.out.println("Program will terminate.");
-                System.exit(0);			   
-            }
-            
-            // At this moment, both streams exist, so call the method to create the fomatted files
-            processFilesForValidation(sc, pw, "NJ");
-            System.out.println("File has been copied ");
-        }
+			outputFile = "IEEE" + i + ".json";
+			try{ 
+				outputFiles[i-1] = new File(outputFile);
+				pw = new PrintWriter(outputFiles[i-1]);
+			}
+			catch(FileNotFoundException e) {							   
+				System.out.println("Could not open and create file " + outputFile);
+				System.out.println("\nDeleting all other created files, closing input files, and exiting program");
+				pw.close();
+				for (File file : outputFiles){
+					if (file.exists()){	// deletes all existing files
+						file.delete();
+					}
+				}
+				System.exit(0);		   
+			}
+			pw.close();
+
+			outputFile = "ACM" + i + ".json";
+			try{ 
+				outputFiles[i+10-1] = new File(outputFile);
+				pw = new PrintWriter(outputFiles[i+10-1]);
+			}
+			catch(FileNotFoundException e) {							   
+				System.out.println("Could not open and create file " + outputFile);
+				System.out.println("\nDeleting all other created files, closing input files, and exiting program");
+				pw.close();
+				for (File file : outputFiles){ // deletes all existing files
+					if (file.exists()){
+						file.delete();
+					}
+				}
+				System.exit(0);			   
+			}
+			pw.close();
+
+			outputFile = "NJ" + i + ".json";
+			try{ 
+				outputFiles[i+20-1] = new File(outputFile);
+				pw = new PrintWriter(outputFiles[i+20-1]);
+			}
+			catch(FileNotFoundException e) {							   
+				System.out.println("Could not open and create file " + outputFile);
+				System.out.println("\nDeleting all other created files, closing input files, and exiting program");
+				pw.close();
+				for (File file : outputFiles){
+					if (file.exists()){	// deletes all existing files
+						file.delete();
+					}
+				}
+				System.exit(0);			   
+			}
+			pw.close();
+		}
+
+
+		for (int i = 1; i < 11; i++){
+			latexFile = "Latex" + i + ".bib";
+			try{ 
+				sc = new Scanner(new FileInputStream(latexFile));
+			}
+			catch(Exception e) {							   
+				System.out.println("Trouble writing to file " + outputFiles[i-1].getName());		   
+			}
+			processFilesForValidation(sc, pw, i, outputFiles);
+			sc.close();
+			pw.close();
+		}
+
+
+
+		/*
+		 * Allows us to delete all the output files by entering anything into the keyboard (saves time when testing)
+		 */
+		System.out.println("Enter anything to delete output files");
+		ui.nextLine();
+
+		for (File file : outputFiles){
+			if (file.exists()){
+				file.delete();
+			}
+		}
+
+		System.out.println("Output files deleted.");
 		
+		ui.close();
 
-        System.out.println("Enter file name that you'd like to be printed: ");
-        String fileName = kb.nextLine();
+    }	// main
 
-        // Attempt to open the requested file
-        try
-		{
-			br = new BufferedReader(new FileReader(fileName));		
-		}
-		catch(FileNotFoundException e) 
-		{							   
-			System.out.println("Problem opening files. Cannot proceed to copy.");
-			System.out.println("Program will terminate.");
-			System.exit(0);			   
-		}
 
-        // Print out contents of requested file
-        try
-		{
-			displayFileContents(br);
-		}
-		catch(IOException e)
-		{
-			System.out.println("Error: An error has occurred while reading from the " + fileName + " file. ");
-			System.out.println("Program will terminate.");
-			System.exit(0);		
-		}
-	
 
-        kb.close();
-	}
-}
+
+	}	// class
