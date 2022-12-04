@@ -10,20 +10,21 @@ import java.io.File;
 
 public class BibliographyFactory{
 
-	private static int invalidFileCount = 1;
+	private static int invalidFileCount = 0;	// keeping track of number files with empty information fields
+
 	public static void processFilesForValidation(Scanner s, PrintWriter p, int fileNumber, File[] outputFiles)
 	{
 		// Read line by line from input file and copy it to output file
-		String str;
-		String type = "No type";
-		String data;
-		int startIndex;
-		int endIndex;
-		boolean noData = false;
-		int counter = 0;
+		String str;		// line of latex file
+		String type = "No type";		// type of field
+		String data;		// field data
+		int startIndex;		// start index of field data string
+		int endIndex;		// end index of field data string
+		boolean noData = false;		// changed to true when an empty field is found
+		int counter = 0;	// there are 11 data fields, so this counter will loop 11 times to retrieve info
 		int articleCounter = 1;
 
-		Article[] article = new Article[30];
+		Article[] article = new Article[30];		// used to hold all article objects created from latex file
 		String author = null;
 		String journal = null;
 		String title = null;
@@ -37,30 +38,23 @@ public class BibliographyFactory{
 		String month = null;
 		int articleIndex = 1;
 
-		// yeah good luck figuring this one out
 		while(s.hasNextLine())
 		{
 			counter = 0;
-			noData = false;
 			str = s.nextLine();		
 			if(str.indexOf("@ARTICLE{") != -1){
-				//System.out.println("Article found!");
 				articleIndex = articleCounter;
-				while (counter < 11){	// there are always 11
+				while (counter < 11){	// there are always 11 fields
 					str = s.nextLine();
-					//System.out.println("Line: " + str);
-					if(str.indexOf("={") != -1){
+					if(str.indexOf("={") != -1){		// if line has ={
 						startIndex = str.indexOf("={");
 						type = str.substring(0, startIndex);
-						if (str.charAt(startIndex + 2) == '}'){
-							//System.out.println("No data");
+						if (str.charAt(startIndex + 2) == '}'){		// if line has ={}
 							noData = true;
 							break;
 						}
 						endIndex = str.indexOf("},");
-						data = str.substring(startIndex + 2, endIndex);
-						//System.out.println("Data: " + data);
-						
+						data = str.substring(startIndex + 2, endIndex);						
 						if (type.equals("author")){
 							author = data;
 						}
@@ -94,14 +88,12 @@ public class BibliographyFactory{
 						else if (type.equals("month")){
 							month = data;
 						}
-						
-						counter++;
+						counter++;		// find next data field as long as counter < 11
 					}
 				}
 				try{
-					if (!noData){
+					if (!noData){		// if no empty fields were found
 						article[articleCounter - 1] = new Article(author, journal, title, year, volume, number, pages, keywords, doi, ISSN, month, articleIndex);
-						//System.out.println("Article object created!");
 						articleCounter++;
 					}
 					else {
@@ -110,37 +102,35 @@ public class BibliographyFactory{
 				}
 				catch (FileInvalidException e){
 					System.out.println(e.getMessage());
-					System.out.println("Problem detected with input file: latex" + fileNumber + ".bib");
+					System.out.println("Problem detected with input file: Latex" + fileNumber + ".bib");
 					System.out.println("File is invalid: Field \"" + type + "\" is empty. Processing stopped at this point."
 					+  " Other empty fields may be present as well!\n");
-					outputFiles[fileNumber-1].delete();
+					outputFiles[fileNumber-1].delete();		// delete IEEE, ACM, and NJ files for given Latex file
 					outputFiles[fileNumber+10-1].delete();
 					outputFiles[fileNumber+20-1].delete();
 					invalidFileCount++;
 					s.close();
 					return;
 				}
-				
-				//System.out.println();
 			}
 			
 		}
 		s.close();
-		try{
+		try{		// for latex file 1, print to file in outputFiles[] array at index 0...
 			p = new PrintWriter(outputFiles[fileNumber-1]);
 		}
 		catch (Exception e){
 			System.out.println("Problem in processing method");
 		}
 		for (Article a : article){
-			if (a != null){
+			if (a != null){		// if file was deleted because of an empty field, 'a' will be null
 				p.println(a.toIEEE());
 				p.println();
 			}
 		}
 		p.close();
 
-		try{
+		try{		// for latex file 1, print to file in outputFiles[] array at index 10 (ACM files start at index 10)
 			p = new PrintWriter(outputFiles[fileNumber+10-1]);
 		}
 		catch (Exception e){
@@ -154,7 +144,7 @@ public class BibliographyFactory{
 		}
 		p.close();
 
-		try{
+		try{		// for latex file 1, print to file in outputFiles[] array at index 20 (NJ files start at index 20)
 			p = new PrintWriter(outputFiles[fileNumber+20-1]);
 		}
 		catch (Exception e){
@@ -166,7 +156,6 @@ public class BibliographyFactory{
 				p.println();
 			}
 		}
-		//System.out.println("File done!");
         p.close();
 	}	// processFilesForValidaton
 
@@ -177,11 +166,9 @@ public class BibliographyFactory{
 		PrintWriter pw = null;
 		BufferedReader br = null;
 		String latexFile, outputFile, fileToRead, fileToDisplay, currentLine;
-		File[] outputFiles = new File[30];
-		int fileToPrintIndex = -1;
-		int loopCount = 0;
+		File[] outputFiles = new File[30];		// stores IEEE, ACM, and NJ files
 
-		System.out.println("Welcome to BibliographyFactory!");
+		System.out.println("\nWelcome to BibliographyFactory!\n");
 
 		/*
 		* Opens each file
@@ -276,12 +263,16 @@ public class BibliographyFactory{
 		System.out.println("A total of " + invalidFileCount + " files were invalid, and could not be processed. All other " + (10-invalidFileCount)
 		+ " \"Valid\" files have been created.\n");
 
+
+		int fileToPrintIndex = -1;		// if requested file exists, this becomes the file's index in outputFiles[] array
+		int loopCount = 0;		// used to loop once and give user two chances to enter name of file
+
 		while (true){
 			System.out.print("Please enter the name of one of the files that you need to review: ");
 			fileToRead = ui.nextLine();
 			try{
 				for (int i = 0; i < outputFiles.length; i++){
-					if (outputFiles[i].exists()){
+					if (outputFiles[i].exists()){		// can't get the name of null
 						if (outputFiles[i].getName().equals(fileToRead)){
 							fileToPrintIndex = i;
 							break;
@@ -291,7 +282,7 @@ public class BibliographyFactory{
 				if(fileToPrintIndex != -1){
 					break;
 				}
-				else if (fileToPrintIndex == -1 && loopCount == 0){
+				else if (fileToPrintIndex == -1 && loopCount == 0){		// file name doesn't exist BUT it's the FIRST try
 					throw new FileNotFoundException("Could not open input file. File does not exist; possibly it could not be created!\n\n"
 					+ "However, you will be allowed another chance to enter another file name.");
 				}
@@ -299,17 +290,19 @@ public class BibliographyFactory{
 			catch (FileNotFoundException e){
 				System.out.println(e.getMessage());
 			}
-			if (loopCount ==1 && fileToPrintIndex == -1){
+			if (loopCount ==1 && fileToPrintIndex == -1){		// file name doesn't exist AND it's the SECOND try
 				System.out.println("\nCould not open input file again! Either file does not exist or could not be created.");
 				System.out.println("Sorry! I am unable to display your desired files! Program will exit!\n");
 				System.exit(0);
 			}
-			loopCount++;
+			loopCount++;		// loopCount = 1 now
 		}
 
 		fileToDisplay = outputFiles[fileToPrintIndex].getName();
 		System.out.println("Here are the contents of the successfully created Jason file: " + fileToDisplay);
 
+
+		// prints out requested file line by line
 		try{
 			br = new BufferedReader(new FileReader(fileToDisplay));
 			currentLine = br.readLine();
@@ -328,18 +321,19 @@ public class BibliographyFactory{
 		
 		System.out.println();
 
-		/*
-		System.out.println("\nEnter anything to delete output files");
-		ui.nextLine();
 
-		for (File file : outputFiles){
-			if (file.exists()){
-				file.delete();
-			}
-		}
+		// This block commented out below is used to delete all output files when testing code
+		
+		// System.out.println("\nEnter anything to delete output files");
+		// ui.nextLine();
 
-		System.out.println("Output files deleted.");
-		*/
+		// for (File file : outputFiles){
+		// 	if (file.exists()){
+		// 		file.delete();
+		// 	}
+		// }
+
+		// System.out.println("Output files deleted.");
 		
 		ui.close();
 
