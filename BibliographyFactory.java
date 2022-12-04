@@ -1,6 +1,7 @@
 
 import java.util.Scanner;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
@@ -9,7 +10,7 @@ import java.io.File;
 
 public class BibliographyFactory{
 
-
+	private static int invalidFileCount = 1;
 	public static void processFilesForValidation(Scanner s, PrintWriter p, int fileNumber, File[] outputFiles)
 	{
 		// Read line by line from input file and copy it to output file
@@ -22,7 +23,7 @@ public class BibliographyFactory{
 		int counter = 0;
 		int articleCounter = 1;
 
-		Article[] article = new Article[20];
+		Article[] article = new Article[30];
 		String author = null;
 		String journal = null;
 		String title = null;
@@ -97,23 +98,29 @@ public class BibliographyFactory{
 						counter++;
 					}
 				}
-				if (!noData){
-					article[articleCounter - 1] = new Article(author, journal, title, year, volume, number, pages, keywords, doi, ISSN, month, articleIndex);
-					//System.out.println("Article object created!");
-					articleCounter++;
+				try{
+					if (!noData){
+						article[articleCounter - 1] = new Article(author, journal, title, year, volume, number, pages, keywords, doi, ISSN, month, articleIndex);
+						//System.out.println("Article object created!");
+						articleCounter++;
+					}
+					else {
+						throw new FileInvalidException("Error: Detected Empty Field!\n============================\n");
+					}
 				}
-				else {
-					System.out.println("Error: Detected Empty Field!");
-					System.out.println("============================\n");
+				catch (FileInvalidException e){
+					System.out.println(e.getMessage());
 					System.out.println("Problem detected with input file: latex" + fileNumber + ".bib");
 					System.out.println("File is invalid: Field \"" + type + "\" is empty. Processing stopped at this point."
 					+  " Other empty fields may be present as well!\n");
 					outputFiles[fileNumber-1].delete();
 					outputFiles[fileNumber+10-1].delete();
 					outputFiles[fileNumber+20-1].delete();
+					invalidFileCount++;
 					s.close();
 					return;
 				}
+				
 				//System.out.println();
 			}
 			
@@ -161,15 +168,20 @@ public class BibliographyFactory{
 		}
 		//System.out.println("File done!");
         p.close();
-	}
+	}	// processFilesForValidaton
 
 
 	public static void main(String args[]){
 		Scanner ui = new Scanner(System.in);
 		Scanner sc = null;
 		PrintWriter pw = null;
-		String latexFile, outputFile, line;
+		BufferedReader br = null;
+		String latexFile, outputFile, fileToRead, fileToDisplay, currentLine;
 		File[] outputFiles = new File[30];
+		int fileToPrintIndex = -1;
+		int loopCount = 0;
+
+		System.out.println("Welcome to BibliographyFactory!");
 
 		/*
 		* Opens each file
@@ -261,13 +273,63 @@ public class BibliographyFactory{
 			sc.close();
 			pw.close();
 		}
+		System.out.println("A total of " + invalidFileCount + " files were invalid, and could not be processed. All other " + (10-invalidFileCount)
+		+ " \"Valid\" files have been created.\n");
 
+		while (true){
+			System.out.print("Please enter the name of one of the files that you need to review: ");
+			fileToRead = ui.nextLine();
+			try{
+				for (int i = 0; i < outputFiles.length; i++){
+					if (outputFiles[i].exists()){
+						if (outputFiles[i].getName().equals(fileToRead)){
+							fileToPrintIndex = i;
+							break;
+						}
+					}
+				}
+				if(fileToPrintIndex != -1){
+					break;
+				}
+				else if (fileToPrintIndex == -1 && loopCount == 0){
+					throw new FileNotFoundException("Could not open input file. File does not exist; possibly it could not be created!\n\n"
+					+ "However, you will be allowed another chance to enter another file name.");
+				}
+			}
+			catch (FileNotFoundException e){
+				System.out.println(e.getMessage());
+			}
+			if (loopCount ==1 && fileToPrintIndex == -1){
+				System.out.println("\nCould not open input file again! Either file does not exist or could not be created.");
+				System.out.println("Sorry! I am unable to display your desired files! Program will exit!\n");
+				System.exit(0);
+			}
+			loopCount++;
+		}
 
+		fileToDisplay = outputFiles[fileToPrintIndex].getName();
+		System.out.println("Here are the contents of the successfully created Jason file: " + fileToDisplay);
+
+		try{
+			br = new BufferedReader(new FileReader(fileToDisplay));
+			currentLine = br.readLine();
+			while (currentLine != null){
+				System.out.println(currentLine);
+				currentLine = br.readLine();
+			}
+			br.close();
+		}
+		catch (FileNotFoundException e){
+			System.out.println("File not found");
+		}
+		catch (IOException e){
+			System.out.println("IO problem");
+		}
+		
+		System.out.println();
 
 		/*
-		 * Allows us to delete all the output files by entering anything into the keyboard (saves time when testing)
-		 */
-		System.out.println("Enter anything to delete output files");
+		System.out.println("\nEnter anything to delete output files");
 		ui.nextLine();
 
 		for (File file : outputFiles){
@@ -277,6 +339,7 @@ public class BibliographyFactory{
 		}
 
 		System.out.println("Output files deleted.");
+		*/
 		
 		ui.close();
 

@@ -151,7 +151,7 @@ public class Article {
             authorACM = author.substring(0, endIndex) + " et al";
         }
         return "[" + index + "]" + "\t" + authorACM + ". " + year + ". " + title + ". " + journal + ". " + volume + ", " + number +
-        "(" + year + "), " + pages + ". DOI:https://doi.org/" + doi + ".";
+        " (" + year + "), " + pages + ". DOI:https://doi.org/" + doi + ".";
     }
 
     public String toNJ(){
