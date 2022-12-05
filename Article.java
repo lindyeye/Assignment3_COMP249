@@ -44,91 +44,215 @@ public class Article {
         this.index = index;
     }
 
+    
+    /** 
+     * returns author of article
+     * @return String author name
+     */
     public String getAuthor() {
         return author;
     }
+    
+    /** 
+     * sets author of the article
+     * @param author author to change to
+     */
     public void setAuthor(String author) {
         this.author = author;
     }
 
+    
+    /** 
+     * returns journal info
+     * @return String journal info
+     */
     public String getJournal() {
         return journal;
     }
+    
+    /** 
+     * sets journal info
+     * @param journal journal info
+     */
     public void setJournal(String journal) {
         this.journal = journal;
     }
 
+    
+    /** 
+     * returns title of the article
+     * @return String title of article
+     */
     public String getTitle() {
         return title;
     }
+    
+    /** 
+     * sets title of the article
+     * @param title title of the article
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    
+    /** 
+     * returns year the article was published
+     * @return String year article was published
+     */
     public String getYear() {
         return year;
     }
+    
+    /**
+     * sets year the article was published 
+     * @param year year the article was published
+     */
     public void setYear(String year) {
         this.year = year;
     }
 
+    
+    /** 
+     * gets volume of article
+     * @return String volume
+     */
     public String getVolume() {
         return volume;
     }
+    
+    /** 
+     * sets volume of article
+     * @param volume volume
+     */
     public void setVolume(String volume) {
         this.volume = volume;
     }
 
+    
+    /** 
+     * gets number of the article
+     * @return String number
+     */
     public String getNumber() {
         return number;
     }
+    
+    /** 
+     * sets number of article
+     * @param number number
+     */
     public void setNumber(String number) {
         this.number = number;
     }
 
+    
+    /** 
+     * gets pages of article
+     * @return String pages
+     */
     public String getPages() {
         return pages;
     }
+    
+    /** 
+     * sets pages of article
+     * @param pages pages of article
+     */
     public void setPages(String pages) {
         this.pages = pages;
     }
 
+    
+    /** 
+     * gets keywords of article
+     * @return String keywords of article
+     */
     public String getKeywords() {
         return keywords;
     }
+    
+    /** 
+     * sets keywords of article
+     * @param keywords keywords
+     */
     public void setKeywords(String keywords) {
         this.keywords = keywords;
     }
 
+    
+    /** 
+     * gets DOI of article
+     * @return String DOI of article
+     */
     public String getDoi() {
         return doi;
     }
+    
+    /** 
+     * sets DOI of article
+     * @param doi DOI
+     */
     public void setDoi(String doi) {
         this.doi = doi;
     }
 
+    
+    /** 
+     * gets ISSN of article
+     * @return String ISSN
+     */
     public String getISSN() {
         return ISSN;
     }
+    
+    /** 
+     * sets ISSN of article
+     * @param iSSN ISSN
+     */
     public void setISSN(String iSSN) {
         ISSN = iSSN;
     }
     
+    
+    /** 
+     * gets month article was published
+     * @return String month
+     */
     public String getMonth() {
         return month;
     }
+    
+    /** 
+     * sets month article was published
+     * @param month month article was published
+     */
     public void setMonth(String month) {
         this.month = month;
     }
 
+    
+    /** 
+     * gets index of article
+     * @return int index
+     */
     public int getIndex() {
         return index;
     }
+    
+    /** 
+     * sets index of article
+     * @param index index of article
+     */
     public void setIndex(int index) {
         this.index = index;
     }
 
-    //idea here is that it seperates the author names and puts them into a new string so they're properly formatted. idk if it works this is just a theory
+    
+    /** 
+     * outputs the citation for IEEE
+     * @return String IEEE citation
+     */
     public String toIEEE()
     {
         int index = author.indexOf(" and ");
@@ -143,6 +267,11 @@ public class Article {
                 
     }
 
+    
+    /** 
+     * outputs the citation for ACM
+     * @return String ACM citation
+     */
     public String toACM()
     {
         int endIndex = author.indexOf(" and ");
@@ -154,6 +283,11 @@ public class Article {
         " (" + year + "), " + pages + ". DOI:https://doi.org/" + doi + ".";
     }
 
+    
+    /**
+     * outputs the citation for NJ
+     * @return String NJ citation
+     */
     public String toNJ(){
         int index = author.indexOf(" and ");
         String authorNJ = author;

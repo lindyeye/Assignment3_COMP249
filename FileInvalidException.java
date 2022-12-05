@@ -4,12 +4,15 @@ public class FileInvalidException extends Exception {
 		super("Error: Input file cannot be parsed due to missing information(i.e. month={}, title={}, etc.)");
 	}
 	
-	// A constructor that takes a String parameter
 	public FileInvalidException(String s)
 	{
 		super(s);
 	}
 	
+	/** 
+	 * Returns message for exception
+	 * @return String message of exception
+	 */
 	public String getMessage()
 	{
 		return super.getMessage();
