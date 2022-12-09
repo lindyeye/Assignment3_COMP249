@@ -322,18 +322,18 @@ public class BibliographyFactory{
 		System.out.println();
 
 
-		// This block commented out below is used to delete all output files when testing code
+		//This block commented out below is used to delete all output files when testing code
 		
-		// System.out.println("\nEnter anything to delete output files");
-		// ui.nextLine();
+		System.out.println("\nEnter anything to delete output files");
+		ui.nextLine();
 
-		// for (File file : outputFiles){
-		// 	if (file.exists()){
-		// 		file.delete();
-		// 	}
-		// }
+		for (File file : outputFiles){
+			if (file.exists()){
+				file.delete();
+			}
+		}
 
-		// System.out.println("Output files deleted.");
+		System.out.println("Output files deleted.");
 		
 		ui.close();
 
