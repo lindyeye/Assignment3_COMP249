@@ -24,7 +24,7 @@ public class BibliographyFactory{
 		int counter = 0;	// there are 11 data fields, so this counter will loop 11 times to retrieve info
 		int articleCounter = 1;
 
-		Article[] article = new Article[30];		// used to hold all article objects created from latex file
+		Article[] article = new Article[40];		// used to hold all article objects created from latex file
 		String author = null;
 		String journal = null;
 		String title = null;
@@ -342,4 +342,4 @@ public class BibliographyFactory{
 
 
 
-	}	// class
+}	// class
