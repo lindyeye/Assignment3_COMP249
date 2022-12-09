@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"<Unnamed>","l":"Article"},{"p":"<Unnamed>","l":"BibliographyFactory"},{"p":"<Unnamed>","l":"FileInvalidException"}];updateSearchResults();
